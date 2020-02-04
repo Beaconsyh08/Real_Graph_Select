@@ -5,7 +5,8 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import Poem, User
-import time
+import time, datetime
+from sqlalchemy import desc
 
 
 # app = Flask(__name__)
@@ -21,42 +22,38 @@ def index():
     info = Poem.query.filter_by(flag=0).first()
     url = str(info.url).split(",")
     urls = [u[2:-2] for u in url]
-    id, poem, keyword, url, chosen = info.id, info.poem, info.keyword, urls, info.chosen
 
-    images = {'id': id,
-              'poem': poem,
-              'keyword': keyword,
-              'url': url,
-              'chosen': chosen,
+    images = {'id': info.id,
+              'poem': info.poem,
+              'keyword': info.keyword,
+              'url': urls,
+              'chosen': info.chosen,
               }
     return render_template('index.html', title='Home', user=user, images=images)
 
 
-@app.route("/hello", methods=["POST"])
+@app.route("/query", methods=["POST"])
 def query():
     if request.method == "POST":
-        print("haha")
         print(request.json)
         info.chosen = request.json['data']
         # change the flag to 1: marked
         info.flag = request.json['flag']
+        info.time_stamp = datetime.datetime.now()
+        info.date = datetime.date.today()
         db.session.add(info)
         db.session.commit()
+        return make_response("")
 
-        # TODO
-        info2 = Poem.query.filter_by(flag=0).first()
-        url = str(info.url).split(",")
-        urls = [u[2:-2] for u in url]
-        id, poem, keyword, url, chosen = info2.id, info2.poem, info2.keyword, urls, info2.chosen
-        user = {'username': 'Mi'}
-        images = {'id': id,
-                  'poem': poem,
-                  'keyword': keyword,
-                  'url': url,
-                  'chosen': chosen,
-                  }
-        return render_template('index.html', title='Home', user=user, images=images)
-        # return make_response("")
+
+@app.route("/previous", methods=["POST"])
+def previous():
+    if request.method == "POST":
+        previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
+        previous_info.flag = request.json['flag']
+        db.session.add(previous_info)
+        db.session.commit()
+    return make_response("")
 
 
 @app.route('/login', methods=['GET', 'POST'])

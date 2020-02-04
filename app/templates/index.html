@@ -6,7 +6,7 @@
         function show_info(pop_up) {
             alert(pop_up);
             // POST
-            fetch('/hello', {
+            fetch('/query', {
 
                 // Specify the method
                 method: 'POST',
@@ -28,17 +28,23 @@
         */
 
 
-        function sendJson(url, flag) {
-            alert("Mark this img");
+        function sendJson(url, flag, route) {
+
+
+            if (flag == 1) {
+                alert("Mark this img");
+            } else if (flag == 2) {
+                alert("No satisfied graph")
+            }
             var xhr = new XMLHttpRequest();
-            xhr.open("post", "/hello", true);
+            xhr.open("post", route, true);
             xhr.setRequestHeader('content-type', 'application/json');
             xhr.send(JSON.stringify({
                 "data": url,
                 "flag": flag
             }));
             {#xhr.onload = function() {#}
-            {#console.log("hello")#}
+            {#console.log("query")#}
             {#console.log(this.responsetext);#}
             {#var data = json.parse(this.responsetext);#}
             {#console.log(data);#}
@@ -50,7 +56,7 @@
     </script>
 
     {#    <script type="text/javascript">#}
-    {#        function hello() {#}
+    {#        function query() {#}
     {#            $.ajax(#}
     {#                {#}
     {#                    type: "POST",#}
@@ -77,13 +83,13 @@
     </div>
     <div style="text-align:center;"><p>
         {% for url in images.url %}
-            <img src="{{ url }}" width="300" height="225" onclick=" sendJson('{{ url }}', 1); window.location.reload();">
+            <img src="{{ url }}" width="300" height="225" onclick=" sendJson('{{ url }}', 1, '/query'); window.location.reload();">
         {% endfor %}
     </p></div>
     <div>
         <p style="text-align:center;">
-            <button onclick="show_info('Previous Poem')">Previous</button>
-            <button onclick="sendJson('', 2); window.location.reload(); ">Next</button>
+            <button onclick="sendJson('previous', 0, '/previous'); window.location.reload()">Previous</button>
+            <button onclick="sendJson('', 2, '/query'); window.location.reload(); ">Next</button>
         </p>
     </div>
 {% endblock %}

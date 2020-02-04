@@ -13,6 +13,8 @@ class Poem(db.Model):
     url = db.Column(db.String(2000))
     chosen = db.Column(db.String(200))
     flag = db.Column(db.Integer, index=True)
+    time_stamp = db.Column(db.DateTime, default=datetime.now)
+    date = db.Column(db.Date)
 
     def __repr__(self):
         return '<{}@{}@{}@{}@{}@{}>'.format(self.id, self.poem, self.keyword, self.url, self.chosen, self.flag)
