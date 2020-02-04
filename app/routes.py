@@ -5,9 +5,10 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import Poem, User
-import time, datetime
+import time
+import datetime
 from sqlalchemy import desc
-
+from sqlalchemy.sql.expression import func
 
 # app = Flask(__name__)
 
@@ -19,7 +20,7 @@ def index():
     user = {'username': 'Mi'}
     global info
     time.sleep(1)
-    info = Poem.query.filter_by(flag=0).first()
+    info = Poem.query.filter_by(flag=0).order_by(func.random()).first()
     url = str(info.url).split(",")
     urls = [u[2:-2] for u in url]
 
