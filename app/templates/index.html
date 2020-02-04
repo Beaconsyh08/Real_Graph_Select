@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <script>
+        /*
+        function show_info(pop_up) {
+            alert(pop_up);
+            // POST
+            fetch('/hello', {
+
+                // Specify the method
+                method: 'POST',
+
+                // A JSON payload
+                body: JSON.stringify({
+                    "greeting": "Hello from the browser!"
+                })
+            }).then(function (response) { // At this point, Flask has printed our JSON
+                return response.text();
+            }).then(function (text) {
+
+                console.log('POST response: ');
+
+                // Should be 'OK' if everything was successful
+                console.log(text);
+            });
+        }
+        */
+
+
+        function sendJson(url, flag) {
+            alert("Mark this img");
+            var xhr = new XMLHttpRequest();
+            xhr.open("post", "/hello", true);
+            xhr.setRequestHeader('content-type', 'application/json');
+            xhr.send(JSON.stringify({
+                "data": url,
+                "flag": flag
+            }));
+            {#xhr.onload = function() {#}
+            {#console.log("hello")#}
+            {#console.log(this.responsetext);#}
+            {#var data = json.parse(this.responsetext);#}
+            {#console.log(data);#}
+            {#\}#}
+
+        }
+
+
+    </script>
+
+    {#    <script type="text/javascript">#}
+    {#        function hello() {#}
+    {#            $.ajax(#}
+    {#                {#}
+    {#                    type: "POST",#}
+    {#                    url: "/index",#}
+    {#                    dataType: "html",#}
+    {#                    success: function (msg) {#}
+    {#                        console.log(msg);#}
+    {#                        $("#display").html(msg);#}
+    {#                    },#}
+    {#                    error: function (xhr, status, error) {#}
+    {#                        console.log(error);#}
+    {#                    }#}
+    {#                });#}
+    {#        }#}
+    {#    </script>#}
+
+    <h1 style="text-align:center;">Hi, {{ user.username }}!</h1>
+    <div style="text-align:center;"><p style="color:red;">Please choose the most suitable image for the following
+        poem. </p></div>
+    <div style="text-align:center;">
+        <p>Poem Id: {{ images.id }}<br/></p>
+        <p>Poem: <b>{{ images.poem }}</b><br/></p>
+        <p>Keyword: {{ images.keyword }}</p><br/>
+    </div>
+    <div style="text-align:center;"><p>
+        {% for url in images.url %}
+            <img src="{{ url }}" width="300" height="225" onclick=" sendJson('{{ url }}', 1); window.location.reload();">
+        {% endfor %}
+    </p></div>
+    <div>
+        <p style="text-align:center;">
+            <button onclick="show_info('Previous Poem')">Previous</button>
+            <button onclick="sendJson('', 2); window.location.reload(); ">Next</button>
+        </p>
+    </div>
+{% endblock %}
