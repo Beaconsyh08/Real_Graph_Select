@@ -10,15 +10,21 @@ import datetime
 from sqlalchemy import desc
 from sqlalchemy.sql.expression import func
 
-
 # app = Flask(__name__)
+"""
+flag = 0: ready to mark
+flag = 1: marked
+flag = 2: no satisfied graph
+flag = 3: confirmed
+flag = 4: denied
+"""
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    user = {'username': 'Mi'}
+    user_info = {'username': str(current_user)[6:-1]}
     global info
     time.sleep(1)
     info = Poem.query.filter_by(flag=0).order_by(func.random()).first()
@@ -33,7 +39,7 @@ def index():
     if request.method == "POST":
         rec_data = request.json['data']
 
-    return render_template('index.html', title='Home', user=user, images=images)
+    return render_template('index.html', title='Home', user=user_info, images=images)
 
 
 @app.route("/query", methods=["POST"])
@@ -45,7 +51,9 @@ def query():
             info.flag = request.json['flag']
             info.time_stamp = datetime.datetime.now()
             info.date = datetime.date.today()
-            pass
+            info.marked_by = str(current_user)[6:-1]
+            db.session.add(info)
+
         elif str(rec_data) == "previous":
             previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
             previous_info.flag = request.json['flag']
@@ -56,6 +64,7 @@ def query():
             info.flag = request.json['flag']
             info.time_stamp = datetime.datetime.now()
             info.date = datetime.date.today()
+            info.marked_by = str(current_user)[6:-1]
             db.session.add(info)
         db.session.commit()
         return make_response("")
@@ -89,8 +98,8 @@ def review_query():
         if request.method == "POST":
             print(request.json)
             rec_data = request.json['data']
-            if rec_data == "deny":
-                review_info.chosen = ""
+            if rec_data == "confirm":
+                review_info.confirmed_by = str(current_user)[6:-1]
             review_info.flag = request.json['flag']
             db.session.add(review_info)
             db.session.commit()
