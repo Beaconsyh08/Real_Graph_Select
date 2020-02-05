@@ -10,6 +10,7 @@ import datetime
 from sqlalchemy import desc
 from sqlalchemy.sql.expression import func
 
+
 # app = Flask(__name__)
 
 
@@ -28,8 +29,10 @@ def index():
               'poem': info.poem,
               'keyword': info.keyword,
               'url': urls,
-              'chosen': info.chosen,
               }
+    if request.method == "POST":
+        rec_data = request.json['data']
+
     return render_template('index.html', title='Home', user=user, images=images)
 
 
@@ -37,22 +40,57 @@ def index():
 def query():
     if request.method == "POST":
         print(request.json)
-        info.chosen = request.json['data']
-        # change the flag to 1: marked
-        info.flag = request.json['flag']
-        info.time_stamp = datetime.datetime.now()
-        info.date = datetime.date.today()
-        db.session.add(info)
+        rec_data = request.json['data']
+        if str(rec_data) == "next":
+            info.flag = request.json['flag']
+            info.time_stamp = datetime.datetime.now()
+            info.date = datetime.date.today()
+            pass
+        elif str(rec_data) == "previous":
+            previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
+            previous_info.flag = request.json['flag']
+            db.session.add(previous_info)
+        else:
+            info.chosen = rec_data
+            # change the flag to 1: marked
+            info.flag = request.json['flag']
+            info.time_stamp = datetime.datetime.now()
+            info.date = datetime.date.today()
+            db.session.add(info)
         db.session.commit()
         return make_response("")
 
 
-@app.route("/previous", methods=["POST"])
-def previous():
+# @app.route("/previous", methods=["POST"])
+# def previous():
+#     if request.method == "POST":
+#         previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
+#         previous_info.flag = request.json['flag']
+#         db.session.add(previous_info)
+#         db.session.commit()
+#     return make_response("")
+
+@app.route("/review")
+def review():
+    global review_info
+    review_info = Poem.query.filter_by(flag=1).first()
+    images = {'id': review_info.id,
+              'poem': review_info.poem,
+              'keyword': review_info.keyword,
+              'chosen': review_info.chosen,
+              }
+    return render_template('review.html', title='Review', images=images)
+
+
+@app.route("/review_query", methods=['POST'])
+def review_query():
     if request.method == "POST":
-        previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
-        previous_info.flag = request.json['flag']
-        db.session.add(previous_info)
+        print(request.json)
+        rec_data = request.json['data']
+        if rec_data == "deny":
+            review_info.chosen = ""
+        review_info.flag = request.json['flag']
+        db.session.add(review_info)
         db.session.commit()
     return make_response("")
 

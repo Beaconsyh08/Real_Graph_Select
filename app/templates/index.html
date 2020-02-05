@@ -7,10 +7,8 @@
             alert(pop_up);
             // POST
             fetch('/query', {
-
                 // Specify the method
                 method: 'POST',
-
                 // A JSON payload
                 body: JSON.stringify({
                     "greeting": "Hello from the browser!"
@@ -18,9 +16,7 @@
             }).then(function (response) { // At this point, Flask has printed our JSON
                 return response.text();
             }).then(function (text) {
-
                 console.log('POST response: ');
-
                 // Should be 'OK' if everything was successful
                 console.log(text);
             });
@@ -29,12 +25,12 @@
 
 
         function sendJson(url, flag, route) {
-
-
             if (flag == 1) {
                 alert("Mark this img");
             } else if (flag == 2) {
                 alert("No satisfied graph")
+            } else if (flag == 0) {
+                alert("You canceled the previous one")
             }
             var xhr = new XMLHttpRequest();
             xhr.open("post", route, true);
@@ -51,8 +47,6 @@
             {#\}#}
 
         }
-
-
     </script>
 
     {#    <script type="text/javascript">#}
@@ -88,8 +82,8 @@
     </p></div>
     <div>
         <p style="text-align:center;">
-            <button onclick="sendJson('previous', 0, '/previous'); window.location.reload()">Previous</button>
-            <button onclick="sendJson('', 2, '/query'); window.location.reload(); ">Next</button>
+            <button onclick="sendJson('previous', 0, '/query')">Cancel Previous</button>
+            <button onclick="sendJson('next', 2, '/query'); window.location.reload(); ">Next</button>
         </p>
     </div>
 {% endblock %}
