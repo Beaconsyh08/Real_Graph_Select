@@ -15,6 +15,7 @@ class Poem(db.Model):
     flag = db.Column(db.Integer, index=True)
     time_stamp = db.Column(db.DateTime, default=datetime.now)
     date = db.Column(db.Date)
+    marked_by = db.Column(db.String(200))
 
     def __repr__(self):
         return '<{}@{}@{}@{}@{}@{}>'.format(self.id, self.poem, self.keyword, self.url, self.chosen, self.flag)

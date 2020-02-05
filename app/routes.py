@@ -61,37 +61,39 @@ def query():
         return make_response("")
 
 
-# @app.route("/previous", methods=["POST"])
-# def previous():
-#     if request.method == "POST":
-#         previous_info = Poem.query.filter_by(flag=1).order_by(desc(Poem.time_stamp)).first()
-#         previous_info.flag = request.json['flag']
-#         db.session.add(previous_info)
-#         db.session.commit()
-#     return make_response("")
-
 @app.route("/review")
+@login_required
 def review():
     global review_info
-    review_info = Poem.query.filter_by(flag=1).first()
-    images = {'id': review_info.id,
-              'poem': review_info.poem,
-              'keyword': review_info.keyword,
-              'chosen': review_info.chosen,
-              }
+    time.sleep(1)
+    try:
+        review_info = Poem.query.filter_by(flag=1).first()
+        images = {'id': review_info.id,
+                  'poem': review_info.poem,
+                  'keyword': review_info.keyword,
+                  'chosen': review_info.chosen,
+                  }
+    except:
+        review_info = None
+        images = {'id': "Sorry",
+                  'poem': "No poem has been marked",
+                  'keyword': "!",
+                  'chosen': "https://images.unsplash.com/photo-1525847664954-bcd1e64c6ad8?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1000&amp;q=80",
+                  }
     return render_template('review.html', title='Review', images=images)
 
 
 @app.route("/review_query", methods=['POST'])
 def review_query():
-    if request.method == "POST":
-        print(request.json)
-        rec_data = request.json['data']
-        if rec_data == "deny":
-            review_info.chosen = ""
-        review_info.flag = request.json['flag']
-        db.session.add(review_info)
-        db.session.commit()
+    if review is not None:
+        if request.method == "POST":
+            print(request.json)
+            rec_data = request.json['data']
+            if rec_data == "deny":
+                review_info.chosen = ""
+            review_info.flag = request.json['flag']
+            db.session.add(review_info)
+            db.session.commit()
     return make_response("")
 
 
