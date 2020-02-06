@@ -36,10 +36,16 @@ def index():
               'keyword': info.keyword,
               'url': urls,
               }
-    if request.method == "POST":
-        rec_data = request.json['data']
 
-    return render_template('index.html', title='Home', user=user_info, images=images)
+    global marked_img_count
+    marked_img_count = Poem.query.filter_by(flag=1).count()
+    no_sat_img_count = Poem.query.filter_by(flag=2).count()
+
+    choose_numbers = {
+        'marked': marked_img_count,
+        'viewed': marked_img_count + no_sat_img_count
+    }
+    return render_template('index.html', title='Home', user=user_info, images=images, numbers=choose_numbers)
 
 
 @app.route("/query", methods=["POST"])
@@ -75,21 +81,30 @@ def query():
 def review():
     global review_info
     time.sleep(1)
-    try:
+    confirmed_img_count = Poem.query.filter_by(flag=3).count()
+    denied_img_count = Poem.query.filter_by(flag=4).count()
+
+    if marked_img_count > 0:
         review_info = Poem.query.filter_by(flag=1).first()
         images = {'id': review_info.id,
                   'poem': review_info.poem,
                   'keyword': review_info.keyword,
                   'chosen': review_info.chosen,
                   }
-    except:
+    else:
         review_info = None
         images = {'id': "Sorry",
                   'poem': "No poem has been marked",
                   'keyword': "!",
                   'chosen': "https://images.unsplash.com/photo-1525847664954-bcd1e64c6ad8?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1000&amp;q=80",
                   }
-    return render_template('review.html', title='Review', images=images)
+
+    review_numbers = {
+        'marked': marked_img_count,
+        'confirmed': confirmed_img_count,
+        'denied': denied_img_count
+    }
+    return render_template('review.html', title='Review', images=images, numbers=review_numbers)
 
 
 @app.route("/review_query", methods=['POST'])

@@ -25,13 +25,7 @@
 
 
         function sendJson(url, flag, route) {
-            if (flag == 1) {
-                alert("Mark this img");
-            } else if (flag == 2) {
-                alert("No satisfied graph")
-            } else if (flag == 0) {
-                alert("You canceled the previous one")
-            }
+
             var xhr = new XMLHttpRequest();
             xhr.open("post", route, true);
             xhr.setRequestHeader('content-type', 'application/json');
@@ -73,7 +67,8 @@
     <div style="text-align:center;">
         <p>Poem Id: {{ images.id }}<br/></p>
         <p>Poem: <b>{{ images.poem }}</b><br/></p>
-        <p>Keyword: {{ images.keyword }}</p><br/>
+        <p>Keyword: {{ images.keyword }}</p>
+        <p>Marked: <b>{{ numbers.marked }}</b> Viewed: <b>{{ numbers.viewed }}</b></p><br/>
     </div>
     <div style="text-align:center;"><p>
         {% for url in images.url %}
